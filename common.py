@@ -4,10 +4,11 @@ except ImportError: # pragma: no cover
     numpy = None
 
 from vistrails.core.modules.basic_modules import List, ListType
-from vistrails.core.modules.config import ModuleSettings
 from vistrails.core.modules.output_modules import OutputModule, FileMode
 from vistrails.core.modules.vistrails_module import Module, ModuleError, \
     Converter
+
+from . import __name__ as pkgname
 
 
 class InternalModuleError(Exception):
@@ -206,8 +207,6 @@ class BuildTable(Module):
     Input can be a mix of lists, which will be used as single columns, and
     whole tables, whose column names will be mangled.
     """
-    _settings = ModuleSettings(configure_widget=
-            'vistrails.packages.tabledata.widgets:BuildTableWidget')
     _output_ports = [('value', Table)]
 
     def __init__(self):
@@ -321,6 +320,9 @@ class TableOutput(OutputModule):
     _input_ports = [('value', 'Table')]
     _output_modes = [TableToFileMode]
 
-_modules = [(Table, {'abstract': True}), ExtractColumn, BuildTable,
+_modules = [(Table, {'abstract': True}),
+            ExtractColumn,
+            (BuildTable, {'configureWidgetType':
+                              '%s.widgets:BuildTableWidget' % pkgname}),
             (SingleColumnTable, {'hide_descriptor': True}),
             TableOutput]
