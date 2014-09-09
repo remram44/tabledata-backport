@@ -502,14 +502,16 @@ class TestDatesToMatplotlib(unittest.TestCase):
         from matplotlib.dates import date2num
 
         import urllib2
+        from .. import __name__ as pkgname
         source = (""
         "import datetime\n"
-        "from vistrails.packages.tabledata.convert.convert_dates import \\\n"
+        "from %s.convert.convert_dates import \\\n"
         "    make_timezone\n"
         "datetimes = [\n"
         "        datetime.datetime(2013, 5, 29, 11, 18, 33),\n"
         "        datetime.datetime(2013, 5, 29, 8, 11, 47,\n"
-        "                          tzinfo=make_timezone('-0700'))]\n")
+        "                          tzinfo=make_timezone('-0700'))]\n" %
+        pkgname)
         source = urllib2.quote(source)
 
         with intercept_result(DatesToMatplotlib, 'dates') as results:
