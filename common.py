@@ -197,7 +197,7 @@ class ExtractColumn(Module):
 
         self.setResult('value', table.get_column(
                 column_idx,
-                self.getInputFromPort('numeric', allow_default=True)))
+                self.getInputFromPort('numeric', allowDefault=True)))
 
 
 class BuildTable(Module):
