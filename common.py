@@ -4,7 +4,6 @@ except ImportError: # pragma: no cover
     numpy = None
 
 from vistrails.core.modules.basic_modules import List, ListType
-from vistrails.core.modules.output_modules import OutputModule, FileMode
 from vistrails.core.modules.vistrails_module import Module, ModuleError, \
     Converter
 
@@ -274,8 +273,11 @@ class SingleColumnTable(Converter):
                 len(column),            # nb_rows
                 ['converted_list']))    # names
 
-class TableToFileMode(FileMode):
+
+class TableToFile(Module):
+    _input_ports = [('value', 'Table')]
     formats = ['html']
+
     def write_html(self, table):
         document = ['<!DOCTYPE html>\n'
                     '<html>\n  <head>\n'
@@ -309,20 +311,16 @@ class TableToFileMode(FileMode):
 
         return ''.join(document)
 
-    def compute_output(self, output_module, configuration=None):
+    def compute(self, output_module, configuration=None):
         value = output_module.getInputFromPort("value")
-        filename = self.get_filename(configuration, suffix='.html')
+        filename = self.interpreter.filePool.create_file(suffix='.html')
         with open(filename, 'wb') as fp:
             fp.write(self.write_html(value))
 
-class TableOutput(OutputModule):
-    _settings = ModuleSettings(configure_widget="vistrails.gui.modules.output_configuration:OutputModuleConfigurationWidget")
-    _input_ports = [('value', 'Table')]
-    _output_modes = [TableToFileMode]
 
 _modules = [(Table, {'abstract': True}),
             ExtractColumn,
             (BuildTable, {'configureWidgetType':
                               '%s.widgets:BuildTableWidget' % pkgname}),
             (SingleColumnTable, {'hide_descriptor': True}),
-            TableOutput]
+            TableToFile]

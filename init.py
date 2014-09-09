@@ -12,7 +12,7 @@ try:
 except ImportError: # pragma: no cover
     pass
 
-from .common import _modules as common_modules, TableOutput
+from .common import _modules as common_modules
 from .convert import _modules as convert_modules
 from .operations import _modules as operation_modules
 from .read import _modules as read_modules
@@ -27,9 +27,8 @@ _modules = [common_modules,
 
 if get_package_manager().has_package( # pragma: no branch
         'org.vistrails.vistrails.spreadsheet'):
-    from .viewer import _modules as viewer_modules, TableToSpreadsheetMode
+    from .viewer import _modules as viewer_modules
     _modules.append(viewer_modules)
-    TableOutput.register_output_mode(TableToSpreadsheetMode)
 
 _modules = make_modules_dict(*_modules)
 
