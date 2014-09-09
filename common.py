@@ -89,11 +89,11 @@ class Table(Module):
     _input_ports = [('name', '(org.vistrails.vistrails.basic:String)')]
     _output_ports = [('value', 'Table')]
 
-    def set_output(self, port_name, value):
+    def setResult(self, port_name, value):
         if self.list_depth == 0 and value is not None and port_name == 'value':
             if value.name is None:
-                value.name = self.force_get_input('name', None)
-        Module.set_output(self, port_name, value)
+                value.name = self.forceGetInputFromPort('name', None)
+        Module.setResult(self, port_name, value)
 
 
 def choose_column(nb_columns, column_names=None, name=None, index=None):
@@ -185,19 +185,19 @@ class ExtractColumn(Module):
             ('value', '(org.vistrails.vistrails.basic:List)')]
 
     def compute(self):
-        table = self.get_input('table')
+        table = self.getInputFromPort('table')
         try:
             column_idx = choose_column(
                     table.columns,
                     column_names=table.names,
-                    name=self.force_get_input('column_name', None),
-                    index=self.force_get_input('column_index', None))
+                    name=self.forceGetInputFromPort('column_name', None),
+                    index=self.forceGetInputFromPort('column_index', None))
         except ValueError, e:
             raise ModuleError(self, e.message)
 
-        self.set_output('value', table.get_column(
+        self.setResult('value', table.get_column(
                 column_idx,
-                self.get_input('numeric', allow_default=True)))
+                self.getInputFromPort('numeric', allow_default=True)))
 
 
 class BuildTable(Module):
@@ -221,7 +221,7 @@ class BuildTable(Module):
     def compute(self):
         items = None
         if self.input_ports_order: # pragma: no branch
-            items = [(p, self.get_input(p))
+            items = [(p, self.getInputFromPort(p))
                      for p in self.input_ports_order]
         if not items:
             raise ModuleError(self, "No inputs were provided")
@@ -258,7 +258,7 @@ class BuildTable(Module):
                 cols.append(item)
                 names.append(portname)
 
-        self.set_output('value', TableObject(cols, nb_rows, names))
+        self.setResult('value', TableObject(cols, nb_rows, names))
 
 
 class SingleColumnTable(Converter):
@@ -267,10 +267,10 @@ class SingleColumnTable(Converter):
     _input_ports = [('in_value', List)]
     _output_ports = [('out_value', Table)]
     def compute(self):
-        column = self.get_input('in_value')
+        column = self.getInputFromPort('in_value')
         if not isinstance(column, ListType):
             column = list(column)
-        self.set_output('out_value', TableObject(
+        self.setResult('out_value', TableObject(
                 [column],               # columns
                 len(column),            # nb_rows
                 ['converted_list']))    # names
@@ -311,7 +311,7 @@ class TableToFileMode(FileMode):
         return ''.join(document)
 
     def compute_output(self, output_module, configuration=None):
-        value = output_module.get_input("value")
+        value = output_module.getInputFromPort("value")
         filename = self.get_filename(configuration, suffix='.html')
         with open(filename, 'wb') as fp:
             fp.write(self.write_html(value))

@@ -140,10 +140,10 @@ class TimestampsToDates(Module):
         return [datetime.datetime.fromtimestamp(t, utc) for t in timestamps]
 
     def compute(self):
-        timestamps = self.get_input('timestamps')
+        timestamps = self.getInputFromPort('timestamps')
 
         result = self.convert(timestamps)
-        self.set_output('dates', result)
+        self.setResult('dates', result)
 
 
 class StringsToDates(Module):
@@ -227,16 +227,16 @@ class StringsToDates(Module):
         return result
 
     def compute(self):
-        tz = self.get_input('timezone')
+        tz = self.getInputFromPort('timezone')
 
-        strings = self.get_input('strings')
-        fmt = self.get_input('format')
+        strings = self.getInputFromPort('strings')
+        fmt = self.getInputFromPort('format')
 
         try:
             result = self.convert(strings, fmt, tz)
         except ValueError, e:
             raise ModuleError(self, e.message)
-        self.set_output('dates', result)
+        self.setResult('dates', result)
 
 
 class DatesToMatplotlib(Module):
@@ -261,9 +261,9 @@ class DatesToMatplotlib(Module):
         except ImportError: # pragma: no cover
             raise ModuleError(self, "matplotlib is not available")
 
-        datetimes = self.get_input('datetimes')
+        datetimes = self.getInputFromPort('datetimes')
         result = self.convert(datetimes)
-        self.set_output('dates', result)
+        self.setResult('dates', result)
 
 
 class TimestampsToMatplotlib(Module):
@@ -291,9 +291,9 @@ class TimestampsToMatplotlib(Module):
         except ImportError: # pragma: no cover
             raise ModuleError(self, "matplotlib is not available")
 
-        timestamps = self.get_input('timestamps')
+        timestamps = self.getInputFromPort('timestamps')
         result = self.convert(timestamps)
-        self.set_output('dates', result)
+        self.setResult('dates', result)
 
 
 class StringsToMatplotlib(Module):
@@ -325,16 +325,16 @@ class StringsToMatplotlib(Module):
         except ImportError: # pragma: no cover
             raise ModuleError(self, "matplotlib is not available")
 
-        tz = self.get_input('timezone')
+        tz = self.getInputFromPort('timezone')
 
-        strings = self.get_input('strings')
-        fmt = self.get_input('format')
+        strings = self.getInputFromPort('strings')
+        fmt = self.getInputFromPort('format')
 
         try:
             result = self.convert(strings, fmt, tz)
         except ValueError, e:
             raise ModuleError(self, e.message)
-        self.set_output('dates', result)
+        self.setResult('dates', result)
 
 
 _modules = {'dates': [

@@ -16,14 +16,14 @@ class JSONTable(Table):
             ('value', Table)]
 
     def compute(self):
-        json_file = self.get_input('file').name
+        json_file = self.getInputFromPort('file').name
         with open(json_file, 'rb') as fp:
             obj = json.load(fp)
         table = self.make_table(obj)
-        self.set_output('column_count', table.columns)
+        self.setResult('column_count', table.columns)
         if table.names is not None:
-            self.set_output('column_names', table.names)
-        self.set_output('value', table)
+            self.setResult('column_names', table.names)
+        self.setResult('value', table)
 
     @staticmethod
     def add_list(columns, key, value):
@@ -91,7 +91,7 @@ class JSONObject(JSONTable):
     def make_table(self, obj):
         if not isinstance(obj, dict):
             raise ModuleError(self, "JSON file is not an object")
-        key_name = self.get_input('key_name', True)
+        key_name = self.getInputFromPort('key_name', True)
         iterator = obj.iteritems()
         try:
             first_key, first_value = next(iterator)

@@ -154,12 +154,12 @@ class CSVFile(Table):
             ('value', Table)]
 
     def compute(self):
-        csv_file = self.get_input('file').name
-        header_present = self.force_get_input('header_present', None)
-        delimiter = self.force_get_input('delimiter', None)
-        skip_lines = self.get_input('skip_lines')
-        dialect = self.force_get_input('dialect', None)
-        sniff_header = self.get_input('sniff_header')
+        csv_file = self.getInputFromPort('file').name
+        header_present = self.forceGetInputFromPort('header_present', None)
+        delimiter = self.forceGetInputFromPort('delimiter', None)
+        skip_lines = self.getInputFromPort('skip_lines')
+        dialect = self.forceGetInputFromPort('dialect', None)
+        sniff_header = self.getInputFromPort('sniff_header')
 
         try:
             table = CSVTable(csv_file, header_present, delimiter, skip_lines,
@@ -167,9 +167,9 @@ class CSVFile(Table):
         except InternalModuleError, e:
             e.raise_module_error(self)
 
-        self.set_output('column_count', table.columns)
-        self.set_output('column_names', table.names)
-        self.set_output('value', table)
+        self.setResult('column_count', table.columns)
+        self.setResult('column_names', table.names)
+        self.setResult('value', table)
 
 
 _modules = [CSVFile]

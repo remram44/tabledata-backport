@@ -46,9 +46,9 @@ class NumPyArray(Module):
             ('value', '(org.vistrails.vistrails.basic:List)')]
 
     def compute(self):
-        filename = self.get_input('file').name
-        if self.has_input('datatype'):
-            dtype = NumPyArray.FORMAT_MAP[self.get_input('datatype')]
+        filename = self.getInputFromPort('file').name
+        if self.hasInputFromPort('datatype'):
+            dtype = NumPyArray.FORMAT_MAP[self.getInputFromPort('datatype')]
         else:
             if filename[-4:].lower() == '.npy':
                 dtype = self.NPY_FMT
@@ -62,9 +62,9 @@ class NumPyArray(Module):
             # Numpy's plain binary format
             # Written with: array.tofile('xxx.dat')
             array = numpy.fromfile(filename, dtype)
-        if self.has_input('shape'):
-            array.shape = tuple(self.get_input('shape'))
-        self.set_output('value', array)
+        if self.hasInputFromPort('shape'):
+            array.shape = tuple(self.getInputFromPort('shape'))
+        self.setResult('value', array)
 
 
 _modules = [NumPyArray]

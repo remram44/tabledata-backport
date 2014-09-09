@@ -23,7 +23,7 @@ class WriteExcelSpreadsheet(Module):
     _output_ports = [('file', '(org.vistrails.vistrails.basic:File)')]
 
     def compute(self):
-        table = self.get_input('table')
+        table = self.getInputFromPort('table')
         rows = table.rows
 
         xlwt = get_xlwt()
@@ -45,7 +45,7 @@ class WriteExcelSpreadsheet(Module):
                               "of expected %d" % (r, rows))
 
         workbook.save(fname)
-        self.set_output('file', fileobj)
+        self.setResult('file', fileobj)
 
 
 _modules = [WriteExcelSpreadsheet]

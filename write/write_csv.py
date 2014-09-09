@@ -22,13 +22,13 @@ class WriteCSV(Module):
     _output_ports = [('file', '(org.vistrails.vistrails.basic:File)')]
 
     def compute(self):
-        table = self.get_input('table')
-        delimiter = self.get_input('delimiter')
+        table = self.getInputFromPort('table')
+        delimiter = self.getInputFromPort('delimiter')
         fileobj = self.interpreter.filePool.create_file(suffix='.csv')
         fname = fileobj.name
 
         with open(fname, 'w') as fp:
-            write_header = self.force_get_input('write_header')
+            write_header = self.forceGetInputFromPort('write_header')
             if write_header is not False:
                 if table.names is None:
                     if write_header is True: # pragma: no cover
@@ -56,7 +56,7 @@ class WriteCSV(Module):
                 debug.warning("WriteCSV wrote %d lines instead of expected "
                               "%d" % (line, rows))
 
-        self.set_output('file', fileobj)
+        self.setResult('file', fileobj)
 
 
 _modules = [WriteCSV]

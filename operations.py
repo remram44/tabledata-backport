@@ -132,10 +132,10 @@ class JoinTables(Table):
     _output_ports = [('value', Table)]
 
     def compute(self):
-        left_t = self.get_input('left_table')
-        right_t = self.get_input('right_table')
-        case_sensitive = self.get_input('case_sensitive')
-        always_prefix = self.get_input('always_prefix')
+        left_t = self.getInputFromPort('left_table')
+        right_t = self.getInputFromPort('right_table')
+        case_sensitive = self.getInputFromPort('case_sensitive')
+        always_prefix = self.getInputFromPort('always_prefix')
 
         def get_column_idx(table, prefix):
             col_name_port = "%s_column_name" % prefix
@@ -144,8 +144,8 @@ class JoinTables(Table):
                 col_idx = choose_column(
                         table.columns,
                         column_names=table.names,
-                        name=self.force_get_input(col_name_port, None),
-                        index=self.force_get_input(col_idx_port, None))
+                        name=self.forceGetInputFromPort(col_name_port, None),
+                        index=self.forceGetInputFromPort(col_idx_port, None))
             except ValueError, e:
                 raise ModuleError(self, e.message)
 
@@ -156,7 +156,7 @@ class JoinTables(Table):
 
         table = JoinedTables(left_t, right_t, left_key_col, right_key_col,
                              case_sensitive, always_prefix)
-        self.set_output('value', table)
+        self.setResult('value', table)
 
 
 class ProjectedTable(TableObject):
@@ -189,17 +189,17 @@ class ProjectTable(Table):
     _output_ports = [("value", Table)]
 
     def compute(self):
-        table = self.get_input("table")
+        table = self.getInputFromPort("table")
         try:
             indexes = choose_columns(
                     table.columns,
                     column_names=table.names,
-                    names=self.force_get_input('column_names', None),
-                    indexes=self.force_get_input('column_indexes', None))
+                    names=self.forceGetInputFromPort('column_names', None),
+                    indexes=self.forceGetInputFromPort('column_indexes', None))
         except ValueError, e:
             raise ModuleError(self, e.message)
-        if self.has_input('new_column_names'):
-            column_names = self.get_input('new_column_names')
+        if self.hasInputFromPort('new_column_names'):
+            column_names = self.getInputFromPort('new_column_names')
             if len(column_names) != len(indexes):
                 raise ModuleError(self,
                                   "new_column_names was specified but doesn't "
@@ -218,7 +218,7 @@ class ProjectTable(Table):
                 column_names.append(name)
 
         projected_table = ProjectedTable(table, indexes, column_names)
-        self.set_output("value", projected_table)
+        self.setResult("value", projected_table)
 
 
 class SelectFromTable(Table):
@@ -261,12 +261,12 @@ class SelectFromTable(Table):
             raise ValueError("Invalid comparison operator %r" % comparer)
 
     def compute(self):
-        table = self.get_input('table')
+        table = self.getInputFromPort('table')
 
-        if self.has_input('str_expr'):
-            (col, comparer, comparand) = self.get_input('str_expr')
-        elif self.has_input('float_expr'):
-            (col, comparer, comparand) = self.get_input('float_expr')
+        if self.hasInputFromPort('str_expr'):
+            (col, comparer, comparand) = self.getInputFromPort('str_expr')
+        elif self.hasInputFromPort('float_expr'):
+            (col, comparer, comparand) = self.getInputFromPort('float_expr')
         else:
             raise ModuleError(self, "Must have some expression")
 
@@ -294,7 +294,7 @@ class SelectFromTable(Table):
             column = table.get_column(col)
             columns.append([column[row] for row in matched_rows])
         selected_table = TableObject(columns, len(matched_rows), table.names)
-        self.set_output('value', selected_table)
+        self.setResult('value', selected_table)
 
 class AggregatedTable(TableObject):
     def __init__(self, table, op, col, group_col):
@@ -357,23 +357,23 @@ class AggregateColumn(Table):
     _output_ports = [('value', 'Table')]
 
     def compute(self):
-        table = self.get_input('table')
-        op = self.get_input('op')
-        column_name = self.force_get_input('column_name', None)
-        column_index = self.force_get_input('column_index', None)
+        table = self.getInputFromPort('table')
+        op = self.getInputFromPort('op')
+        column_name = self.forceGetInputFromPort('column_name', None)
+        column_index = self.forceGetInputFromPort('column_index', None)
         col_idx = choose_column(table.columns,
                                 column_names=table.names,
                                 name=column_name,
                                 index=column_index)
-        group_by_name = self.force_get_input('group_by_name', None)
-        group_by_index = self.force_get_input('group_by_index', None)
+        group_by_name = self.forceGetInputFromPort('group_by_name', None)
+        group_by_index = self.forceGetInputFromPort('group_by_index', None)
         gb_idx = choose_column(table.columns,
                                column_names=table.names,
                                name=group_by_name,
                                index=group_by_index)
 
         res_table = AggregatedTable(table, op, col_idx, gb_idx)
-        self.set_output('value', res_table)
+        self.setResult('value', res_table)
 
 _modules = [JoinTables, ProjectTable, SelectFromTable, AggregateColumn]
 

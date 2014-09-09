@@ -79,34 +79,34 @@ class ExcelSpreadsheet(Table):
         if xlrd is None: # pragma: no cover
             raise ModuleError(self, "xlrd is not available")
 
-        workbook = self.get_input('file')
+        workbook = self.getInputFromPort('file')
         workbook = xlrd.open_workbook(workbook.name)
 
-        if self.has_input('sheet_index'):
-            sheet_index = self.get_input('sheet_index')
-        if self.has_input('sheet_name'):
-            name = self.get_input('sheet_name')
+        if self.hasInputFromPort('sheet_index'):
+            sheet_index = self.getInputFromPort('sheet_index')
+        if self.hasInputFromPort('sheet_name'):
+            name = self.getInputFromPort('sheet_name')
             try:
                 index = workbook.sheet_names().index(name)
             except Exception:
                 raise ModuleError(self, "Sheet name not found")
-            if self.has_input('sheet_index'):
+            if self.hasInputFromPort('sheet_index'):
                 if sheet_index != index:
                     raise ModuleError(self,
                                       "Both sheet_name and sheet_index were "
                                       "specified, and they don't agree")
-        elif self.has_input('sheet_index'):
+        elif self.hasInputFromPort('sheet_index'):
             index = sheet_index
         else:
             index = 0
         sheet = workbook.sheet_by_index(index)
-        header_present = self.get_input('header_present')
+        header_present = self.getInputFromPort('header_present')
         table = ExcelTable(sheet, header_present)
-        self.set_output('value', table)
+        self.setResult('value', table)
 
         if table.names is not None:
-            self.set_output('column_names', table.names)
-        self.set_output('column_count', table.columns)
+            self.setResult('column_names', table.names)
+        self.setResult('column_count', table.columns)
 
 
 _modules = [ExcelSpreadsheet]

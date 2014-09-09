@@ -11,7 +11,7 @@ class TableToSpreadsheetMode(SpreadsheetMode):
         return SpreadsheetMode.can_compute()
 
     def compute_output(self, output_module, configuration=None):
-        table = output_module.get_input('value')
+        table = output_module.getInputFromPort('value')
         self.display_and_wait(output_module, configuration,
                               TableCellWidget, (table,))
 
@@ -21,7 +21,7 @@ class TableCell(SpreadsheetCell):
     _input_ports = [('table', '(org.vistrails.vistrails.tabledata:Table)')]
 
     def compute(self):
-        table = self.get_input('table')
+        table = self.getInputFromPort('table')
         self.displayAndWait(TableCellWidget, (table,))
 
 

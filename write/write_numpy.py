@@ -21,10 +21,10 @@ class WriteNumPy(Module):
     _output_ports = [('file', '(org.vistrails.vistrails.basic:File)')]
 
     def compute(self):
-        array = self.get_input('array')
+        array = self.getInputFromPort('array')
         if not isinstance(array, numpy.ndarray):
             array = numpy.array(array)
-        dtype = NumPyArray.FORMAT_MAP[self.get_input('datatype')]
+        dtype = NumPyArray.FORMAT_MAP[self.getInputFromPort('datatype')]
 
         if dtype is NumPyArray.NPY_FMT:
             fileobj = self.interpreter.filePool.create_file(suffix='.npy')
@@ -39,7 +39,7 @@ class WriteNumPy(Module):
             # Numpy's plain binary format
             array.astype(dtype).tofile(fname)
 
-        self.set_output('file', fileobj)
+        self.setResult('file', fileobj)
 
 
 _modules = [WriteNumPy]
