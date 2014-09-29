@@ -317,6 +317,6 @@ class TableToFile(Module):
 _modules = [(Table, {'abstract': True}),
             ExtractColumn,
             (BuildTable, {'configureWidgetType':
-                              '%s.widgets:BuildTableWidget' % pkgname}),
+                              ('%s.widgets' % pkgname, 'BuildTableWidget')}),
             (SingleColumnTable, {'hide_descriptor': True}),
             TableToFile]
