@@ -307,10 +307,10 @@ class TableToFile(Module):
 
         return ''.join(document)
 
-    def compute(self, output_module, configuration=None):
-        value = output_module.getInputFromPort("value")
+    def compute(self):
+        value = self.getInputFromPort("value")
         filename = self.interpreter.filePool.create_file(suffix='.html')
-        with open(filename, 'wb') as fp:
+        with open(filename.name, 'wb') as fp:
             fp.write(self.write_html(value))
 
 
