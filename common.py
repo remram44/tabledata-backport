@@ -1,9 +1,11 @@
+from __future__ import division
+
 try:
     import numpy
 except ImportError: # pragma: no cover
     numpy = None
 
-from vistrails.core.modules.basic_modules import List, ListType
+from vistrails.core.modules.basic_modules import List, ListType, String
 from vistrails.core.modules.vistrails_module import Module, ModuleError, \
     Converter
 
@@ -260,6 +262,7 @@ class SingleColumnTable(Converter):
     """
     _input_ports = [('in_value', List)]
     _output_ports = [('out_value', Table)]
+
     def compute(self):
         column = self.getInputFromPort('in_value')
         if not isinstance(column, ListType):
@@ -271,10 +274,15 @@ class SingleColumnTable(Converter):
 
 
 class TableToFile(Module):
-    _input_ports = [('value', 'Table')]
-    formats = ['html']
+    _input_ports = [('value', 'Table'),
+                    ('format', String,
+                     {'defaults': "['html']", 'optional': True,
+                      'entry_types': "['enum']",
+                      'values': "[['html', 'csv']]"})]
+    formats = ['html', 'csv']
 
-    def write_html(self, table):
+    @staticmethod
+    def make_html(table):
         document = ['<!DOCTYPE html>\n'
                     '<html>\n  <head>\n'
                     '    <meta http-equiv="Content-type" content="text/html; '
@@ -307,11 +315,25 @@ class TableToFile(Module):
 
         return ''.join(document)
 
+    def write_html(self, table, filename):
+        with open(filename, 'wb') as fp:
+            fp.write(self.make_html(table))
+
+    def write_csv(self, table, filename):
+        from .write.write_csv import WriteCSV
+
+        WriteCSV.write(filename, table)
+
     def compute(self):
         value = self.getInputFromPort("value")
-        filename = self.interpreter.filePool.create_file(suffix='.html')
-        with open(filename.name, 'wb') as fp:
-            fp.write(self.write_html(value))
+        format = self.getInputFromPort('format').lower()
+        filename = self.interpreter.filePool.create_file(suffix='.%s' % format)
+        try:
+            func = getattr(self, 'write_%s' % format)
+        except AttributeError:
+            raise AttributeError("TableToFile: unknown format %s" % format)
+        else:
+            func(value, filename.name)
 
 
 _modules = [(Table, {'abstract': True}),

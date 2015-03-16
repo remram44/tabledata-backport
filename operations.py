@@ -1,3 +1,5 @@
+from __future__ import division
+
 try:
     import numpy
 except ImportError: # pragma: no cover
@@ -88,7 +90,6 @@ class JoinedTables(TableObject):
 
     def compute_row_map(self):
         def build_key_dict(table, key_col):
-            key_dict = {}
             column = table.get_column(key_col)
             if self.case_sensitive:
                 key_dict = dict((utf8(val).strip(), i)
@@ -296,6 +297,7 @@ class SelectFromTable(Table):
         selected_table = TableObject(columns, len(matched_rows), table.names)
         self.setResult('value', selected_table)
 
+
 class AggregatedTable(TableObject):
     def __init__(self, table, op, col, group_col):
         self.table = table
@@ -344,6 +346,7 @@ class AggregatedTable(TableObject):
                         for x in self.agg_rows]
             else:
                 raise ValueError('Unknown operation: "%s"' % self.op)
+
 
 class AggregateColumn(Table):
     _input_ports = [('table', 'Table'),
