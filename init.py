@@ -36,11 +36,28 @@ _modules = make_modules_dict(*_modules)
 
 
 def handle_module_upgrade_request(controller, module_id, pipeline):
-    def add_keyname(fname, module):
-        new_function = controller.create_function(module, 
+    old_module = pipeline.modules[module_id]
+    if (old_module.name == 'JSONFile' and old_module.version != '0.1.5' and
+            old_module.namespace == 'read'):
+        from vistrails.core.db.action import create_action
+        from vistrails.core.modules.module_registry import get_module_registry
+        from .read.read_json import JSONObject
+
+        reg = get_module_registry()
+        new_desc = reg.get_descriptor(JSONObject)
+        new_module = controller.create_module_from_descriptor(
+                new_desc,
+                old_module.location.x, old_module.location.y)
+        actions = UpgradeWorkflowHandler.replace_generic(
+                controller, pipeline,
+                old_module, new_module)
+
+        new_function = controller.create_function(new_module,
                                                   "key_name",
                                                   ["_key"])
-        return [('add', new_function, 'module', module.id)]
+        actions.append(create_action([('add', new_function,
+                                       'module', new_module.id)]))
+        return actions
 
     module_remap = {
             'read|csv|CSVFile': [
@@ -76,10 +93,7 @@ def handle_module_upgrade_request(controller, module_id, pipeline):
                 ('0.1.3', '0.1.4', None, {})
             ],
             'read|JSONFile': [
-                (None, '0.1.5', 'read|JSONObject', {
-                    'function_remap': {
-                        None: add_keyname},
-                })
+                (None, '0.1.5', 'read|JSONObject')
             ],
         }
 
